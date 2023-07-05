@@ -16,15 +16,12 @@ from nltk import pos_tag, sent_tokenize, wordpunct_tokenize
 log = logging.getLogger("log")
 log.setLevel('WARNING')
 
-CAT_PATTERN = r'([a-z_\s]+)/.*'
-DOC_PATTERN = r'(?!\.)[a-z_\s]+/[a-f0-9]+\.json'
-
 class JSONCorpusReader(CategorizedCorpusReader, CorpusReader):
     """
     A corpus reader for raw line-delimited JSON documents to enable preprocessing.
     """
 
-    def __init__(self, root, fileids=DOC_PATTERN, encoding='utf8', **kwargs):
+    def __init__(self, root, fileids, encoding='utf8', **kwargs):
         """
         Initialize the corpus reader.  Categorization arguments
         (``cat_pattern``, ``cat_map``, and ``cat_file``) are passed to
@@ -77,5 +74,3 @@ class JSONCorpusReader(CategorizedCorpusReader, CorpusReader):
         for path in self.abspaths(fileids):
             yield os.path.getsize(path)
 
-if __name__ == '__main__':
-    test = JSONCorpusReader("/PROJECTES/ADAPTATION/proj/nmishra/p20230515_NM_tweets_learning/tweets/data")
