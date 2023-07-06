@@ -1,17 +1,23 @@
 """
-Tweet Reader
+Tweet Reader Class Object
 """
 
 import json
 import os
+import time
 import codecs
 import logging
 import pickle
+from six import string_types
 
 from nltk.corpus.reader.api import CorpusReader
 from nltk.corpus.reader.api import CategorizedCorpusReader
 
-from nltk import pos_tag, sent_tokenize, wordpunct_tokenize
+import nltk
+# nltk.download('averaged_perceptron_tagger')
+# from nltk.tag import pos_tag
+
+from nltk.tokenize import TweetTokenizer
 
 log = logging.getLogger("log")
 log.setLevel('WARNING')
@@ -21,20 +27,19 @@ class JSONCorpusReader(CategorizedCorpusReader, CorpusReader):
     A corpus reader for raw line-delimited JSON documents to enable preprocessing.
     """
 
-    def __init__(self, root, fileids, encoding='utf8', **kwargs):
+    def __init__(self, root, fileids, encoding='utf8', word_tokenizer=TweetTokenizer(), **kwargs):
         """
         Initialize the corpus reader.  Categorization arguments
         (``cat_pattern``, ``cat_map``, and ``cat_file``) are passed to
         the ``CategorizedCorpusReader`` constructor.  The remaining
         arguments are passed to the ``CorpusReader`` constructor.
         """
-        # Add the default category pattern if not passed into the class.
-        if not any(k.startswith('cat_') for k,v in kwargs.items()):
-            kwargs['cat_pattern'] = CAT_PATTERN
 
         # Initialize the NLTK corpus reader objects
         CategorizedCorpusReader.__init__(self, kwargs)
         CorpusReader.__init__(self, root, fileids, encoding)
+
+        self._word_tokenizer = word_tokenizer
 
     def resolve(self, fileids, categories):
         """
@@ -51,16 +56,17 @@ class JSONCorpusReader(CategorizedCorpusReader, CorpusReader):
 
     def docs(self, fileids=None, categories=None):
         """
-        Returns the complete tweets of a JSON document, closing the document
-        after we are done reading it and yielding it in a memory safe fashion.
+        Returns the complete tweet from line delimited JSON document,
+        closing after done, reading it and yielding it in a memory safe fashion.
         """
         # Resolve the fileids and the categories
         fileids = self.resolve(fileids, categories)
 
         # Create a generator, loading one document into memory at a time.
         for path, encoding in self.abspaths(fileids, include_encoding=True):
-            with codecs.open(path, 'r', encoding=encoding) as f:
-                yield f.read()
+            with codecs.open(path, 'r', encoding=encoding) as file:
+                for line in file:
+                    yield json.loads(line)
 
     def sizes(self, fileids=None, categories=None):
         """
@@ -73,4 +79,79 @@ class JSONCorpusReader(CategorizedCorpusReader, CorpusReader):
         # Create a generator, getting every path and computing filesize
         for path in self.abspaths(fileids):
             yield os.path.getsize(path)
+
+    def fields(self, fields, fileids=None, categories=None):
+        """
+        extract particular fields from the json object. Can be string or an 
+        iterable of fields. If just one fields in passed in, then the values 
+        are returned, otherwise dictionaries of the requested fields returned
+        """
+        if isinstance(fields, string_types):
+            fields = [fields,]
+
+        if "text" in fields:
+            raise KeyError("To extract 'text' field, please use other methods: tokenized, processed tweets")
+
+        for doc in self.docs(fileids, categories):
+            if (len(fields) == 1) & (fields[0] in doc):
+                yield doc[fields[0]]
+            else:
+                yield {key : doc.get(key, None) for key in fields}
+
+    def tokenized(self, fileids=None, categories=None):
+        """
+        Returns tweet as a list of words.
+        """
+        for tweet in self.docs(fileids, categories):
+            tokens = self._word_tokenizer.tokenize(tweet.get('text', None))
+            yield tokens
+            # pos_tag(tokens, lang=self.fields('lang')) supports english and russian only
+
+    def process_tweets(self, fileids=None, categories=None):
+        """
+        Returns processed tweets from tokenized tweets.
+        """
+        for tokenized_tweet in self.tokenized(fileids, categories):
+            processed = []
+            for token in tokenized_tweet:
+                if '@' in token:
+                    token = '@user'
+                elif ('http' or 'https') in token:
+                    token = 'URL'
+                else:
+                    pass
+                processed.append(token)
+            yield processed
+
+    def describe(self, fileids=None, categories=None):
+        """
+        Performs a single pass of the corpus and
+        returns a dictionary with a variety of metrics
+        concerning the state of the corpus.
+        """
+        started = time.time()
+
+        # Structures to perform counting
+        counts  = nltk.FreqDist()
+        tokens  = nltk.FreqDist()
+
+        # Perform single pass over tweet and count
+        for processed in self.process_tweets(fileids, categories):
+            for token in processed:
+                counts['tokens'] += 1
+                tokens[token] += 1
+
+        # Compute the number of files and categories in the corpus
+        n_fileids = len(self.resolve(fileids, categories) or self.fileids())
+        n_topics  = len(self.categories(self.resolve(fileids, categories)))
+
+        # Return data structure with information
+        return {
+            'files':  n_fileids,
+            'topics': n_topics,
+            'tokens':  counts['tokens'],
+            'vocab':  len(tokens),
+            'lexdiv': float(counts['tokens']) / float(len(tokens)),
+            'secs':   time.time() - started,
+        }
 
