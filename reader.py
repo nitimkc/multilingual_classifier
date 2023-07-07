@@ -18,6 +18,7 @@ import nltk
 # from nltk.tag import pos_tag
 
 from nltk.tokenize import TweetTokenizer
+nltk.download('stopwords')
 
 log = logging.getLogger("log")
 log.setLevel('WARNING')
@@ -105,7 +106,7 @@ class JSONCorpusReader(CategorizedCorpusReader, CorpusReader):
         for tweet in self.docs(fileids, categories):
             tokenized_tweet = self._word_tokenizer.tokenize(tweet.get('text', None))
             # pos_tag(tokens, lang=self.fields('lang')) supports english and russian only
-            
+
             processed = []
             for token in tokenized_tweet:
                 if '@' in token:
@@ -124,13 +125,16 @@ class JSONCorpusReader(CategorizedCorpusReader, CorpusReader):
         for processed_tokens in self.process_tweets(fileids, categories):
             yield " ".join(processed_tokens)
 
-    def describe(self, fileids=None, categories=None):
+    def describe(self, fileids=None, categories=None, stopwords=False):
         """
         Performs a single pass of the corpus and returns a nested dictionary with a 
         variety of metrics concerning the state of the corpus, including frequency
         distribution of tokens.
         """
         started = time.time()
+        if stopwords:
+            lang_dict = {'en':'english', 'fr':'french', 'de':'german', 'es':'spanish', 'it':'italian', 'ca':'catalan', 'eu':'basque'}
+            stop_words = {k:'v' for k in nltk.corpus.stopwords.words(fileids=lang_dict[categories])}
 
         # Structures to perform counting
         counts  = nltk.FreqDist()
@@ -138,9 +142,10 @@ class JSONCorpusReader(CategorizedCorpusReader, CorpusReader):
 
         # Perform single pass over tweet and count
         for processed in self.process_tweets(fileids, categories):
-            for token in processed:
+            tokens_list = [token for token in processed if token.lower() not in stop_words] if stopwords else processed
+            for token in tokens_list:
                 counts['tokens'] += 1
-                tokens[token] += 1
+                tokens[token.lower()] += 1
 
         # Compute the number of files and categories in the corpus
         n_fileids = len(self.resolve(fileids, categories) or self.fileids())

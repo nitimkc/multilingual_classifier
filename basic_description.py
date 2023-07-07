@@ -1,20 +1,30 @@
 """
-Use Tweet Reader to Read Tweets
+Use Tweet Reader to read tweets, gather statistical descriptions and 
+plot frequency table for N most common token
 """
 
 import argparse
 from pathlib import Path
 import pickle
+import string
 from reader import JSONCorpusReader
+
+import pandas as pd
+import numpy as np
+
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 parser = argparse.ArgumentParser(description="Twitter Meta Analysis")
 parser.add_argument("data_dir", type=str, help="Directory where tweets resides. One folder per language.")
 parser.add_argument("result_dir", type=str, help="Directory where results are to be stores. One folder per language.")
 parser.add_argument("--language", type=str, default=None, help="Language of the tweet to work with.")
+parser.add_argument("--top_n", type=int, default=20, help="Number of most common tokens to extract.")
 args = parser.parse_args()
 
 DATA_PATH = Path(args.data_dir)
 LANG = args.language
+N = args.top_n
 OUTPATH = Path(args.result_dir) if LANG is None else Path(args.result_dir).joinpath(LANG)
 OUTPATH.mkdir(parents=True, exist_ok=True)
 print(OUTPATH)
@@ -45,15 +55,32 @@ corpus = JSONCorpusReader(DATA_PATH.__str__(), fileids=DOC_PATTERN, cat_pattern=
 # print(next(test))
 # print(next(test))
 
-# basic summary
-stats_summary = corpus.describe(categories=LANG)
-tokens = stats_summary['tokens_freq']
+# basic summaries
+stats_summary = corpus.describe(categories=LANG, stopwords=False)
 for (k,v) in stats_summary.items():
     if k!='tokens_freq':
         print(k,v)
-print(tokens)
-# # store token frequency dictionary
-# with open(OUTPATH.joinpath(f'token_freq_{LANG}.pickle'), 'wb') as handle:
-#     pickle.dump(tokens, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+# store token frequency dictionary and plot n most common tokens
+tokens = stats_summary['tokens_freq']
+top_tokens = tokens.most_common(N)
+print(top_tokens)
+
+freq_series = pd.Series(dict(tokens)).sort_values(ascending=False)
+nopunc_series = freq_series[~freq_series.index.isin(list(string.punctuation))]
+# list(string.punctuation) + ['url', '@user']
+
+with open(OUTPATH.joinpath(f'token_freq_series_{LANG}.pickle'), 'wb') as handle:
+    pickle.dump(freq_series, handle, protocol=pickle.HIGHEST_PROTOCOL)
+with open(OUTPATH.joinpath(f'token_nopunc_series_{LANG}.pickle'), 'wb') as handle:
+    pickle.dump(nopunc_series, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+fig, ax = plt.subplots(figsize=(10,10))
+sns.barplot(x=nopunc_series.index[:N], y=nopunc_series[:N].values, ax=ax)
+plt.xticks(rotation=30)
+plt.title(f"Frequency Distribution of Non-Punctuation Tokens in {LANG} Language Corpus")
+plt.xlabel('Count')
+plt.xlabel('Tokens')
+plt.savefig(OUTPATH.joinpath(f'token_freq_distplot_{LANG}.jpg'))
 
 
