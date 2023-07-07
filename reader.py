@@ -90,7 +90,7 @@ class JSONCorpusReader(CategorizedCorpusReader, CorpusReader):
             fields = [fields,]
 
         if "text" in fields:
-            raise KeyError("To extract 'text' field, please use other methods: tokenized, processed tweets")
+            raise KeyError("To extract 'text' field, please use other methods: process_tweets, processed_tweets")
 
         for doc in self.docs(fileids, categories):
             if (len(fields) == 1) & (fields[0] in doc):
@@ -98,20 +98,14 @@ class JSONCorpusReader(CategorizedCorpusReader, CorpusReader):
             else:
                 yield {key : doc.get(key, None) for key in fields}
 
-    def tokenized(self, fileids=None, categories=None):
-        """
-        Returns tweet as a list of words.
-        """
-        for tweet in self.docs(fileids, categories):
-            tokens = self._word_tokenizer.tokenize(tweet.get('text', None))
-            yield tokens
-            # pos_tag(tokens, lang=self.fields('lang')) supports english and russian only
-
     def process_tweets(self, fileids=None, categories=None):
         """
-        Returns processed tweets from tokenized tweets.
+        Returns processed tokens from tokenized tweets.
         """
-        for tokenized_tweet in self.tokenized(fileids, categories):
+        for tweet in self.docs(fileids, categories):
+            tokenized_tweet = self._word_tokenizer.tokenize(tweet.get('text', None))
+            # pos_tag(tokens, lang=self.fields('lang')) supports english and russian only
+            
             processed = []
             for token in tokenized_tweet:
                 if '@' in token:
@@ -123,11 +117,18 @@ class JSONCorpusReader(CategorizedCorpusReader, CorpusReader):
                 processed.append(token)
             yield processed
 
+    def processed_tweets(self, fileids=None, categories=None):
+        """
+        Returns processed tokens as a string.
+        """
+        for processed_tokens in self.process_tweets(fileids, categories):
+            yield " ".join(processed_tokens)
+
     def describe(self, fileids=None, categories=None):
         """
-        Performs a single pass of the corpus and
-        returns a dictionary with a variety of metrics
-        concerning the state of the corpus.
+        Performs a single pass of the corpus and returns a nested dictionary with a 
+        variety of metrics concerning the state of the corpus, including frequency
+        distribution of tokens.
         """
         started = time.time()
 
@@ -152,6 +153,7 @@ class JSONCorpusReader(CategorizedCorpusReader, CorpusReader):
             'tokens':  counts['tokens'],
             'vocab':  len(tokens),
             'lexdiv': float(counts['tokens']) / float(len(tokens)),
+            'tokens_freq': tokens,
             'secs':   time.time() - started,
         }
 

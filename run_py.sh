@@ -1,0 +1,1 @@
+python metanalysis.py /PROJECTES/ADAPTATION/proj/nmishra/p20230515_NM_tweets_learning/tweets/data /PROJECTES/ADAPTATION/proj/nmishra/p20230704_NM_multilingual_classifier/summary --language=it
