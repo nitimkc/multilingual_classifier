@@ -2,7 +2,7 @@
 Use Tweet Reader to read tweets, gather statistical descriptions and 
 plot frequency table for N most common token
 """
-
+#!/usr/bin/env python3
 import argparse
 from pathlib import Path
 import pickle
@@ -25,14 +25,14 @@ args = parser.parse_args()
 DATA_PATH = Path(args.data_dir)
 LANG = args.language
 N = args.top_n
-OUTPATH = Path(args.result_dir) if LANG is None else Path(args.result_dir).joinpath(LANG)
+OUTPATH = Path(args.result_dir) #if LANG is None else Path(args.result_dir).joinpath(LANG)
 OUTPATH.mkdir(parents=True, exist_ok=True)
 print(OUTPATH)
 
 CAT_PATTERN = r'([a-z_\s]+)/.*'
 DOC_PATTERN = r'(?!\.)[\w_\s]+/[\w\s\d\-]+\.jsonl'
 
-corpus = JSONCorpusReader(DATA_PATH.__str__(), fileids=DOC_PATTERN, cat_pattern=CAT_PATTERN)
+corpus = JSONCorpusReader(DATA_PATH.__str__(), fileids=DOC_PATTERN, cat_pattern=CAT_PATTERN, encoding='latin-1')
 # print(corpus.abspaths())
 # for cat in corpus.categories():
 #     print(cat)
@@ -56,7 +56,7 @@ corpus = JSONCorpusReader(DATA_PATH.__str__(), fileids=DOC_PATTERN, cat_pattern=
 # print(next(test))
 
 # basic summaries
-stats_summary = corpus.describe(categories=LANG, stopwords=False)
+stats_summary = corpus.describe(categories=LANG, stopwords=True)
 for (k,v) in stats_summary.items():
     if k!='tokens_freq':
         print(k,v)

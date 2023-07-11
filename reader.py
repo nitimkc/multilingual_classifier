@@ -67,7 +67,12 @@ class JSONCorpusReader(CategorizedCorpusReader, CorpusReader):
         for path, encoding in self.abspaths(fileids, include_encoding=True):
             with codecs.open(path, 'r', encoding=encoding) as file:
                 for line in file:
-                    yield json.loads(line)
+                    try:
+                        yield json.loads(line)
+                    except json.decoder.JSONDecodeError as readerror:
+                        if readerror.msg == "Extra data":
+                            line.replace("\n", " ")
+                            print(f"Json decode error in file {path}:\n{line}")
 
     def sizes(self, fileids=None, categories=None):
         """
@@ -115,7 +120,7 @@ class JSONCorpusReader(CategorizedCorpusReader, CorpusReader):
                     token = 'URL'
                 else:
                     pass
-                processed.append(token)
+                processed.append(token.strip())
             yield processed
 
     def processed_tweets(self, fileids=None, categories=None):
