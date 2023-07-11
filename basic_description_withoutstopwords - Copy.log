@@ -1,0 +1,55 @@
+\\fs02.isglobal.lan\HPC_ADAPTATION\proj\nmishra\p20230704_NM_multilingual_classifier\summary\without_stopwords
+files 3
+topics 1
+tokens 34279
+vocab 5557
+lexdiv 6.168616159798453
+secs 0.9139442443847656
+\\fs02.isglobal.lan\HPC_ADAPTATION\proj\nmishra\p20230704_NM_multilingual_classifier\summary\without_stopwords
+files 5
+topics 1
+tokens 3295968
+vocab 92306
+lexdiv 35.70697462786818
+secs 79.76016807556152
+[(',', 194819), ('.', 185766), ('@user', 185132), ('grip', 159285), ('url', 85459), ('?', 40922), ('!', 31229), ('covid', 30014), ('’', 27256), ('"', 27220), ('...', 25337), (':', 22843), (')', 18646), ('(', 18613), ('-', 16202), ('d', 14999), ('virus', 14798), ('vacuna', 13908), ('q', 13819), ('anys', 13346), ('any', 12985), ('l', 12520), ('vacunació', 12066), ('cap', 12047), ('ara', 12024)]
+\\fs02.isglobal.lan\HPC_ADAPTATION\proj\nmishra\p20230704_NM_multilingual_classifier\summary\without_stopwords
+files 11
+topics 1
+tokens 19488227
+vocab 244250
+lexdiv 79.7880327533265
+secs 388.71945905685425
+[('@user', 948003), (',', 736495), ('.', 629817), (':', 555738), ('grippe', 528162), ('la', 471601), ('de', 440282), ('rt', 427065), ('…', 394667), ('le', 282600), ('les', 211432), ('’', 203997), ('et', 190847), ('!', 165976), ('covid', 165237), ('"', 152449), ('?', 152220), ('à', 146758), ('en', 143347), ('url', 139042), ('que', 129489), ('pour', 123324), ('est', 116631), ('une', 116257), ('a', 110740)]
+\\fs02.isglobal.lan\HPC_ADAPTATION\proj\nmishra\p20230704_NM_multilingual_classifier\summary\without_stopwords
+files 7
+topics 1
+tokens 11769045
+vocab 255562
+lexdiv 46.05162348079918
+secs 274.5643105506897
+[('@user', 652500), (',', 604502), ('.', 542626), ('influenza', 349505), ('?', 152718), ('url', 147820), ('’', 139448), ('"', 118701), (':', 116805), ('!', 113656), ("l'influenza", 102580), ('...', 90407), ('covid', 84651), (')', 63123), ('(', 60774), ('solo', 57333), ("'", 44787), ('virus', 41317), ('…', 40807), ('rt', 35977), ('anni', 35928), ('-', 35599), ('vaccino', 34514), ('no', 34113), ('fatto', 33958)]
+\\fs02.isglobal.lan\HPC_ADAPTATION\proj\nmishra\p20230704_NM_multilingual_classifier\summary\without_stopwords
+files 31
+topics 1
+tokens 36381131
+vocab 362113
+lexdiv 100.46900000828471
+secs 827.8212175369263
+[('@user', 2122171), (',', 1567198), ('grippe', 1506977), ('.', 1261912), ('’', 724203), ('a', 558513), ('!', 495172), (':', 466430), ('url', 441284), ('?', 432117), ('...', 340224), ("c'est", 324755), ('"', 303759), ('plus', 288749), ('covid', 273475), ('ça', 227961), ('…', 217130), ('rt', 202475), ("j'ai", 180975), ('comme', 179621), ('(', 176178), (')', 171392), ('fait', 168368), ('vaccin', 166232), ('contre', 159159)]
+\\fs02.isglobal.lan\HPC_ADAPTATION\proj\nmishra\p20230704_NM_multilingual_classifier\summary\without_stopwords
+files 22
+topics 1
+tokens 27560431
+vocab 400109
+lexdiv 68.88230707132307
+secs 734.6681227684021
+[(',', 1750568), ('gripe', 1409485), ('@user', 1375630), ('.', 1349715), ('?', 331035), ('url', 327164), ('!', 272785), ('si', 272604), (':', 254572), ('...', 212357), ('"', 201459), ('covid', 176849), ('q', 138012), ('trancazo', 136878), ('rt', 132191), ('…', 114685), ('virus', 100333), ('(', 93252), (')', 92696), ('¿', 91356), ('ahora', 90794), ('gente', 84389), ('-', 83492), ('fiebre', 76888), ('vacuna', 76550)]
+\\fs02.isglobal.lan\HPC_ADAPTATION\proj\nmishra\p20230704_NM_multilingual_classifier\summary\without_stopwords
+files 23
+topics 1
+tokens 29565357
+vocab 346107
+lexdiv 85.42259185743137
+secs 833.1823086738586
+[('.', 1681866), ('flu', 1672241), ('@user', 1162933), (',', 1050688), ('url', 774661), ('’', 527993), ('!', 474395), ('?', 288616), ('got', 264589), ('cold', 241660), ('get', 228741), ('...', 209147), ('sick', 202572), (':', 178805), ('shot', 165510), ('like', 155414), ('season', 139427), ('&', 135063), ('-', 127857), ('"', 108359), ('man', 99815), (')', 98081), ('(', 96433), ('stomach', 92595), ('year', 90699)]
