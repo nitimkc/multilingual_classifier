@@ -52,6 +52,7 @@ class JSONCorpusReader(CategorizedCorpusReader, CorpusReader):
             raise ValueError("Specify fileids or categories, not both")
 
         if categories is not None:
+            print(f"processing categories: {categories}")
             return self.fileids(categories)
         return fileids
 
@@ -103,6 +104,14 @@ class JSONCorpusReader(CategorizedCorpusReader, CorpusReader):
                 yield doc[fields[0]]
             else:
                 yield {key : doc.get(key, None) for key in fields}
+
+    def get_geo(self, fileids=None, categories=None):
+        """
+        check if the tweet as geo object and return it if it exists        
+        """
+        geo = self.fields('geo', fileids, categories)
+        if geo is not None:
+            yield geo
 
     def process_tweets(self, fileids=None, categories=None):
         """
