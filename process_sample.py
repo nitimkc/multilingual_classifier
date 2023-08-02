@@ -43,7 +43,7 @@ print(time.time() - started)
 
 # make a copy of the full pandas dataframe (save in chucks to avoid memory issues)
 # started = time.time()
-# # tweets.to_json(OUTPATH.joinpath("full_df_new.jsonl"), orient="records", lines=True, force_ascii=False)
+# tweets.to_json(OUTPATH.joinpath("full_df_new.jsonl"), orient="records", lines=True, force_ascii=False)
 # N = 5000
 # chunks = [tweets[i:i+N] for i in range(0, tweets.shape[0], N)]
 # f = open(OUTPATH.joinpath("full_df_new.jsonl"), mode="a", encoding='utf8')
@@ -66,6 +66,13 @@ df_short['date'] = df_short['created_at'].apply(lambda x: x.strftime("%Y-%m-%d")
 df_short['month'] = df_short['created_at'].dt.month
 df_short.head()
 
+N = 5000
+chunks = [tweets[i:i+N] for i in range(0, tweets.shape[0], N)]
+f = open(OUTPATH.joinpath("df_filtered.jsonl"), mode="a", encoding='utf8')
+for chunk_df in chunks:
+    f.write(chunk_df.to_json(orient="records", lines=True, force_ascii=False))
+f.close()
+
 # save file by lang and date
 print(df_short['lang'].value_counts())
 for lang, grp in df_short.groupby('lang'):
@@ -85,13 +92,14 @@ plt.show()
 # plot ts per language
 for key, grp in df_short.groupby('lang'):
     lang_df = grp.groupby('date').size()
+    print(lang_df.shape)
     # lang_df = lang_df[lang_df>1]
     lang_df.index = pd.to_datetime(lang_df.index)
-    lang_df.plot(alpha=0.4, figsize=(10,4))
+    lang_df.plot(alpha=0.4, figsize=(10,4), label=key)
     plt.title(f"# of tweets in {key} language query (after language filter)")
     plt.xlim(min(lang_df.index), max(lang_df.index))
     plt.xlabel('time')
-    plt.show()
+    # plt.show()
     fpath = OUTPATH.parent.joinpath('summary').joinpath('ts_plot')
     fpath.mkdir(parents=True, exist_ok=True)
     plt.savefig(fpath.joinpath(f"ts_{key}.jpg"))
@@ -99,12 +107,12 @@ for key, grp in df_short.groupby('lang'):
 # sample by language and month for year 2018+
 df_sample = df_short[df_short['created_at'].dt.year>=2018]
 for lang, grp in df_sample.groupby('lang'):
-        sample = (grp.groupby(['month']).apply(pd.Series.sample, replace=True, n=10)
-        .droplevel([0]).reset_index()
-        )
-        print(sample.shape)
-        sample.drop(['index', 'date','month'], axis=1, inplace=True)
-        fpath = OUTPATH.parent.joinpath('summary').joinpath('sample_2018+')
-        fpath.mkdir(parents=True, exist_ok=True)
-        sample.to_csv(fpath.joinpath(f"sample_{lang}.csv"), index=False)
-        sample.to_json(fpath.joinpath(f"sample_{lang}.jsonl"), orient='records', lines=True)
+    sample = (grp.groupby(['month']).apply(pd.Series.sample, replace=True, n=10)
+    .droplevel([0]).reset_index()
+    )
+    print(sample.shape)
+    sample.drop(['index', 'date','month'], axis=1, inplace=True)
+    fpath = OUTPATH.parent.joinpath('summary').joinpath('sample_2018+')
+    fpath.mkdir(parents=True, exist_ok=True)
+    sample.to_csv(fpath.joinpath(f"sample_{lang}.csv"), index=False)
+    sample.to_json(fpath.joinpath(f"sample_{lang}.jsonl"), orient='records', lines=True)

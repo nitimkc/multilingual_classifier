@@ -32,30 +32,8 @@ print(OUTPATH)
 CAT_PATTERN = r'([a-z_\s]+)/.*'
 DOC_PATTERN = r'(?!\.)[\w_\s]+/[\w\s\d\-]+\.jsonl'
 
-corpus = JSONCorpusReader(DATA_PATH.__str__(), fileids=DOC_PATTERN, cat_pattern=CAT_PATTERN, encoding='latin-1')
-# print(corpus.abspaths())
-# for cat in corpus.categories():
-#     print(cat)
-# print(corpus.resolve(fileids=None, categories=LANG))
-
-# tweet_sizes = corpus.sizes(categories=LANG)
-# print(next(tweet_sizes))
-
-# tweets = corpus.docs()
-# atweet = next(tweets)
-# for k,v in atweet.items():
-#     print(f"{k}----------{v}")
-# print(len(tweets))``
-
-# test = corpus.fields(fields='text')
-# test = corpus.fields(fields=['lang', 'text'], categories=LANG)
-# test = corpus.tokenized(categories=LANG)
-# test = corpus.process_tweets(categories=LANG)
-
-# print(next(test))
-# print(next(test))
-
 # basic summaries
+corpus = JSONCorpusReader(DATA_PATH.__str__(), fileids=DOC_PATTERN, cat_pattern=CAT_PATTERN, encoding='latin-1')
 stats_summary = corpus.describe(categories=LANG, stopwords=True)
 for (k,v) in stats_summary.items():
     if k!='tokens_freq':
@@ -83,4 +61,25 @@ plt.xlabel('Count')
 plt.xlabel('Tokens')
 plt.savefig(OUTPATH.joinpath(f'token_freq_distplot_{LANG}.jpg'))
 
+# functionalities
+# print(corpus.abspaths())
+# for cat in corpus.categories():
+#     print(cat)
+# print(corpus.resolve(fileids=None, categories=LANG))
 
+# tweet_sizes = corpus.sizes(categories=LANG)
+# print(next(tweet_sizes))
+
+# tweets = corpus.docs()
+# atweet = next(tweets)
+# for k,v in atweet.items():
+#     print(f"{k}----------{v}")
+# print(len(tweets))``
+
+# test = corpus.fields(fields='text')
+# test = corpus.fields(fields=['lang', 'text'], categories=LANG)
+# test = corpus.tokenized(categories=LANG)
+# test = corpus.process_tweets(categories=LANG)
+
+# print(next(test))
+# print(next(test))

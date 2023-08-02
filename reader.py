@@ -105,13 +105,18 @@ class JSONCorpusReader(CategorizedCorpusReader, CorpusReader):
             else:
                 yield {key : doc.get(key, None) for key in fields}
 
-    def get_geo(self, fileids=None, categories=None):
+    def get_geo(self, geopath, fileids=None, categories=None):
         """
         check if the tweet as geo object and return it if it exists        
         """
-        geo = self.fields('geo', fileids, categories)
-        if geo is not None:
-            yield geo
+        for geo_fields in self.fields(['id', 'place_id', 'geo', 'user_info'], fileids, categories):
+            geo = {k:v for k,v in geo_fields.items() if k in ['id', 'place_id', 'geo']}
+            geo['location'] = geo_fields['user_info'].get('location', None)
+            geo['description'] = geo_fields['user_info'].get('description', None)
+            with open(geopath, 'a', encoding='latin-1') as file:
+                json.dump(geo, file)
+                file.write('\n')
+            # yield geo
 
     def process_tweets(self, fileids=None, categories=None):
         """
