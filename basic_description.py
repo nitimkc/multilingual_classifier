@@ -7,13 +7,12 @@ import argparse
 from pathlib import Path
 import pickle
 import string
-from reader import JSONCorpusReader
 
 import pandas as pd
-import numpy as np
-
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+from reader import JSONCorpusReader
 
 parser = argparse.ArgumentParser(description="Twitter Meta Analysis")
 parser.add_argument("data_dir", type=str, help="Directory where tweets resides. One folder per language.")
