@@ -1,0 +1,10 @@
+{
+    "MODEL_CHECKPOINT" : [ "jhu-clsp/bernice", "cardiffnlp/twitter-xlm-roberta-base", "bert-base-multilingual-uncased", "microsoft/mdeberta-v3-base", "xlm-roberta-base"],
+    "LANG" :   "all",
+    "BATCH_SIZE" :   16,
+    "LEARNING_RATE" : 3.74E-05,
+    "EPOCHS" : 10, 
+    "MAX_LEN" : 128,
+    "SPLITS" : [[0.6, 0.2, 0.2]],
+    "N_SEARCHES" : 2
+}
