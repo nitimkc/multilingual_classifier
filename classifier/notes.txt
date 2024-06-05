@@ -1,0 +1,61 @@
+# CHECK BEFORE RUNNING THE TRANING FILE 
+
+# check multiling_ili.sh file 
+#    ensure the correct run is uncommented 
+#    ensure correct parameters for the run are provided
+#    ensure .json for gridsearch and .tsv for bestrun
+
+# check outputdir to obtain split index for data exists
+
+# check params file
+#    ensure correct models, lang, batch_size, learning_rates, epochs, max_len and splits values are provided
+
+#### when running wandb gridsearch only
+# check sweep_config.yml and ensure correct learning_rate, batch_size and epochs values are provided
+# check params.json and ensure number of random search value is not 1 in wrraper function
+
+#### when running best run only
+# ensure to disable wandb
+# ensure best hyperparameters for each model in params.tsv file exists and are correct
+
+
+"params to be used"
+"MODEL_CHECKPOINT" : [ "cardiffnlp/twitter-xlm-roberta-base", "jhu-clsp/bernice" ]
+"MODEL_CHECKPOINT" : [ "xlm-roberta-base", "bert-base-multilingual-uncased", "microsoft/mdeberta-v3-base"]
+"MODEL_CHECKPOINT" : [ ""xlm-roberta-large"] # try 
+"MODEL_CHECKPOINT" : [ "timpal0l/mdeberta-v3-base-squad2"]
+
+"MODEL_CHECKPOINT" : [ "bert-base-uncased", "roberta-base", "vinai/bertweet-base", "vinai/bertweet-covid19-base-uncased"]
+"MODEL_CHECKPOINT" : [ "bert-large-uncased", "roberta-large", "vinai/bertweet-large"]
+"MODEL_CHECKPOINT" : [ "digitalepidemiologylab/covid-twitter-bert-v2" ]
+
+"MODEL_CHECKPOINT" : [ "camembert-base", "dbmdz/bert-base-french-europeana-cased"]
+"MODEL_CHECKPOINT" : [ "camembert/camembert-large"]
+
+"MODEL_CHECKPOINT" : [ "dccuchile/bert-base-spanish-wwm-uncased"]
+"MODEL_CHECKPOINT" : [ "dccuchile/bert-base-spanish-wwm-cased"]
+"MODEL_CHECKPOINT" : [ "fmmolina/bert-base-spanish-wwm-uncased-finetuned-NER-medical"]
+
+"MODEL_CHECKPOINT" : [ "dbmdz/bert-base-italian-uncased", "osiria/bert-base-italian-uncased", "osiria/bert-tweet-base-italian-uncased"]
+"MODEL_CHECKPOINT" : [ "dbmdz/bert-base-italian-cased", "osiria/bert-base-italian-cased", "osiria/bert-tweet-base-italian-cased"]
+
+"MODEL_CHECKPOINT" : [ "dbmdz/bert-base-german-uncased", "google-bert/bert-base-german-uncased", "google-bert/bert-base-german-dbmdz-uncased"]
+"MODEL_CHECKPOINT" : [ "dbmdz/bert-base-german-cased", "google-bert/bert-base-german-cased", "google-bert/bert-base-german-dbmdz-cased"]
+"MODEL_CHECKPOINT" : [ "smanjil/German-MedBERT"]
+"MODEL_CHECKPOINT" : [ "deepset/gbert-base", "deepset/gelectra-base"]
+"MODEL_CHECKPOINT" : [ "deepset/gbert-large", "deepset/gelectra-large"]
+
+# Experiment
+# //for stratified split first train test split for each langauge and then combine for training multilingual
+
+# //tried keeping on only padding and truncation equals True in tokenizer and removed max_length, is_split_words arguments 
+# >> worked for multilingual bert versions but not for deberta versions which requires sentencepiece installed 
+# //tried ``ignore_mismatched_sizes=True`` in trainer.py >> fixed for bert based models
+# //for bernice where mismatched tensor sizes cannot be ignored, set max length to 128
+
+# re run bert-base-multilingual-cased-all-finetuned if needed and delete log 6812
+
+# Analysis
+# with larger models, there are more parameters, the represenation matrix is sparse and may not work so well with small size data
+# covid19 related models did not do well probably because there is not enough data (400 data pts only for English) 
+#    and because english does not have covid19 tweets

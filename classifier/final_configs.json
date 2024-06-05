@@ -1,0 +1,36 @@
+{
+    "BATCH_SIZE" : 16,
+    "EPOCHS" : 10, 
+    "MAX_LEN" : 128,
+    "SPLITS" : [[0.6, 0.2, 0.2]],
+    "LANG" :   "all",
+    "MODELS" : 
+    [
+        {
+            "MODEL_CHECKPOINT" : "cardiffnlp/twitter-xlm-roberta-base",
+            "LEARNING_RATE" : 2.121329094057246e-05,
+            "BATCH_SIZE" : 8,
+            "EPOCHS" : 6
+        },{
+            "MODEL_CHECKPOINT" : "jhu-clsp/bernice",
+            "LEARNING_RATE" : 2.7820794319855575e-05,
+            "BATCH_SIZE" : 32,
+            "EPOCHS" : 7
+        },{
+            "MODEL_CHECKPOINT" : "bert-base-multilingual-uncased",
+            "LEARNING_RATE" : 1.5020978833449689e-05,
+            "BATCH_SIZE" : 16,
+            "EPOCHS" : 9
+        },{
+            "MODEL_CHECKPOINT" : "microsoft/mdeberta-v3-base",
+            "LEARNING_RATE" : 3.399329304887933e-05,
+            "BATCH_SIZE" : 32,
+            "EPOCHS" : 4
+        },{
+            "MODEL_CHECKPOINT" : "xlm-roberta-base",
+            "LEARNING_RATE" : 1.089678819474072e-05,
+            "BATCH_SIZE" : 8,
+            "EPOCHS" : 8
+        }
+    ]   
+}
