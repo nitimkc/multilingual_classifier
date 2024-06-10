@@ -91,7 +91,7 @@ def mlm_evaluation(lang_split_idx, tweets, config, split_path, model_path, cache
             
         # evaluate on test set and save
         evaluater = PredictionEvaluater(prediction_set, CONFIG['TARGET_NAMES'], save_path, f"{trainer.model_name}_{lang}")
-        evaluater.evaluation_report(test_df, lang_eval, col_to_eval)
+        evaluater.evaluation_report(test_df, lang, lang_eval, col_to_eval)
      
     except Exception as error:
         print("An error occurred:", error)

@@ -88,6 +88,7 @@ for split in SPLITS:
         else:
             # when learning curve analysis is not required
             if 'learningcurve' not in translation_type:
+            # if ('learningcurve' not in translation_type) & (lang=='en'):
                 lang_split_idx = {}
                 lang_split_idx[lang] = split_idx[lang]
                 lang_eval = LANG_EVAL

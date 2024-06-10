@@ -16,7 +16,27 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 import matplotlib.pyplot as plt
 
-def evaluation_display(y, y_pred, savepath, labels_map=None, model_name=None, plot=False):
+def grouped_score(df, by, train_lang, lang_eval, col_to_eval, savepath, labels_map, model_name, plot):
+    for dtype, dtype_df in df.groupby(by):
+        print(f"\nEvaluation for {by if dtype else f'non-{by}'}")
+        if not dtype:
+            if train_lang != 'all':
+                dtype_df = dtype_df[dtype_df['target_lang']==train_lang] 
+        # print(dtype_df.shape)
+        evaluation_display(y=dtype_df["annotation"], y_pred=dtype_df[f"{model_name}_prediction"],
+                           savepath=savepath, labels_map=labels_map, model_name=f'{model_name}_eval{dtype}', 
+                           plot=plot, by=by)
+        
+        # if language evaluation is required
+        if lang_eval:
+            for eval_lang, lang_df in dtype_df.groupby(col_to_eval):
+                print(f"\n    Evaluation for language: {eval_lang}")
+                # print(lang_df.shape)
+                evaluation_display(y=lang_df["annotation"], y_pred=lang_df[f"{model_name}_prediction"],
+                                   savepath=savepath, labels_map=labels_map, model_name=f'{model_name}_eval{eval_lang}',
+                                   plot=plot, by=by)
+        
+def evaluation_display(y, y_pred, savepath, labels_map=None, model_name=None, plot=False, by=None):
     
     if labels_map is not None:
         labels_idx = [k for k,v in labels_map.items() if k in y.unique()]
@@ -50,7 +70,8 @@ def evaluation_display(y, y_pred, savepath, labels_map=None, model_name=None, pl
         plt.colorbar(cm_disp.im_,  cax=c_bar)
         plt.show()
 
-    result_dict = {'model_name': model_name,
+    result_dict = {'eval_by': by,
+                   'model_name': model_name,
                    'f1_macro':f1_macro,
                    'f1_weighted': f1_weighted,
                    'accuracy': acc,
@@ -93,21 +114,11 @@ class PredictionEvaluater(object):
             sub_df.rename_axis('index').to_csv(self.savepath.joinpath(f"{self._model_name}_predictions.csv"))
         return df
         
-    def evaluation_report(self, test_df, lang_eval=True, col_to_eval="lang"):
+    def evaluation_report(self, test_df, train_lang, lang_eval=True, col_to_eval="lang"):
         df = self.append_predictions(test_df)
-        # evaluation_display(y=df["annotation"], y_pred=df[f"{self._model_name}_prediction"], 
-        #                    savepath=self.savepath, labels_map=self.label_map, 
-        #                    model_name=f'{self._model_name}_evalall', plot=False)
         
-        for dtype, dtype_df in df.groupby('original'):
-            print(f"\nEvaluation for {'original' if dtype==True else 'translated'}")
-            evaluation_display(y=dtype_df["annotation"], y_pred=dtype_df[f"{self._model_name}_prediction"],
-                               savepath=self.savepath, labels_map=self.label_map,
-                               model_name=f'{self._model_name}_eval{dtype}', plot=False)
-            # if language evaluation is required
-            if lang_eval:
-                for lang, lang_df in dtype_df.groupby(col_to_eval):
-                    print(f"\nEvaluation for language: {lang}")
-                    evaluation_display(y=lang_df["annotation"], y_pred=lang_df[f"{self._model_name}_prediction"],
-                                       savepath=self.savepath, labels_map=self.label_map,
-                                       model_name=f'{self._model_name}_eval{lang}', plot=False)
+        grouped_score(df, by='original', train_lang=train_lang, lang_eval=lang_eval, col_to_eval=col_to_eval, 
+                      savepath=self.savepath, labels_map=self.label_map, model_name=self._model_name, plot=False)
+        
+        grouped_score(df, by='overlap', train_lang=train_lang, lang_eval=lang_eval, col_to_eval=col_to_eval, 
+                      savepath=self.savepath, labels_map=self.label_map, model_name=self._model_name, plot=False)
