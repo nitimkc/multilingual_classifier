@@ -75,7 +75,7 @@ class ModelTrainer(object):
         return metric.compute(predictions=predictions, references=labels, average="macro")
 
     def train_eval(self, get_pred=False, metric_name="f1", hyperparam_search=False): #np.random.randint(1000)):
-        print(f"random seed generated for training: {self._num_seed}")
+        print(f"seed used for training: {self._num_seed}")
         
         out_dir = self.modelpath.joinpath(f"{self.model_name}-{self._lang_to_train}-finetuned")
         print(f"Model to be saved in {out_dir}")
