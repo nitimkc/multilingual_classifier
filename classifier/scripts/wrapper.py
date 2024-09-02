@@ -44,7 +44,7 @@ def getsplit(lang_split_idx, tweets, savepath, save=False, lc=False):
     return train_df, valid_df, test_df
 
 def mlm_evaluation(lang_split_idx, tweets, config, split_path, model_path, cache_path, save_path, 
-                   lang, lang_eval, col_to_eval, hyperparams=hyperparams, save=False, lc=False):
+                   lang, lang_eval, col_to_eval, num_seed, hyperparams=hyperparams, save=False, lc=False):
 
     # obtain datasplit index
     if lc:
@@ -81,7 +81,7 @@ def mlm_evaluation(lang_split_idx, tweets, config, split_path, model_path, cache
         train_dataset, valid_dataset, test_dataset = encoded_dataset.splitdata([train_idx, valid_idx, test_idx])
         print(f"Distribution of data splits for {lang} language is {train_dataset.shape}, {valid_dataset.shape}, {test_dataset.shape}")
 
-        trainer = ModelTrainer(CONFIG, train_dataset, valid_dataset, test_dataset, processor.tokenizer(), model_path, cache_path, lang)
+        trainer = ModelTrainer(CONFIG, train_dataset, valid_dataset, test_dataset, processor.tokenizer(), model_path, cache_path, num_seed, lang)
         model, prediction_set = trainer.train_eval(get_pred=True)
         print(f"\n{trainer.model_name} trained on {trainer._lang_to_train} languages")
         

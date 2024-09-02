@@ -28,7 +28,7 @@ hyperparams = ['MODEL_CHECKPOINT','BATCH_SIZE','LEARNING_RATE','EPOCHS','MAX_LEN
 class ModelTrainer(object):
 
     def __init__(self, run_config, train_dataset, valid_dataset, test_dataset,
-                 tokenizer, savepath, cachepath, lang_to_train='all'):     
+                 tokenizer, savepath, cachepath, num_seed, lang_to_train='all'):     
 
         self._run_config = run_config
         if not all(k in self._run_config.keys() for k in hyperparams):
@@ -48,6 +48,8 @@ class ModelTrainer(object):
         self.modelpath = self._savepath.joinpath('models')
         self.modelpath.mkdir(parents=True, exist_ok=True)
         self._cachepath = cachepath
+
+        self._num_seed = num_seed
 
         self._lang_to_train = lang_to_train
         # self._target_names = self._run_config['TARGET_NAMES']
@@ -72,8 +74,8 @@ class ModelTrainer(object):
         metric = evaluate.load(eval_metric)
         return metric.compute(predictions=predictions, references=labels, average="macro")
 
-    def train_eval(self, get_pred=False, metric_name="f1", hyperparam_search=False, num_seed=np.random.randint(1000)):
-        print(f"random seed generated for training: {num_seed}")
+    def train_eval(self, get_pred=False, metric_name="f1", hyperparam_search=False): #np.random.randint(1000)):
+        print(f"random seed generated for training: {self._num_seed}")
         
         out_dir = self.modelpath.joinpath(f"{self.model_name}-{self._lang_to_train}-finetuned")
         print(f"Model to be saved in {out_dir}")
@@ -85,7 +87,7 @@ class ModelTrainer(object):
         
         # attributes to customize the training
         args = TrainingArguments(
-            seed=num_seed,
+            seed=self._num_seed,
             save_total_limit=2,
             output_dir=str(out_dir),
             overwrite_output_dir = True,
@@ -135,6 +137,7 @@ class ModelTrainer(object):
 
         trainer.train()
         trainer.evaluate()
+        trainer.save_model("./model")
         print(f"free space by deleting: {out_dir}")
         shutil.rmtree(out_dir, ignore_errors=True)
         

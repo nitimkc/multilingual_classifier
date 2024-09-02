@@ -18,6 +18,7 @@ from reader import CustomDataset
 from wrapper import mlm_evaluation, getsplit
 
 # args
+print('creating parser')
 parser = argparse.ArgumentParser(description="Twitter ILI infection detection")
 parser.add_argument("--data_file", type=str, help="File name including directory where data resides.")
 parser.add_argument("--params_file", type=str, help="File where parameters to run the model are provided.")
@@ -26,6 +27,7 @@ parser.add_argument("--temp_model_dir", type=str, help="Directory to temporary s
 parser.add_argument("--split_index_filename", type=str, help="Json file name that contains split index to split data for each langauge")
 parser.add_argument("--language_evaluation", type=str, help="Boolean for whether to obtain evaluation groupbed by language")
 parser.add_argument("--language_evaluation_column", type=str, help="Columns to use for language evaluation")
+parser.add_argument("--random_seed", type=int, help="Seed to use for training", default=442, required=False)
 args = parser.parse_args()
 
 DATA_FILE = Path(args.data_file)
@@ -35,8 +37,10 @@ MODEL_PATH = Path(args.temp_model_dir)
 SPLIT_IDX_FILENAME = args.split_index_filename
 LANG_EVAL = args.language_evaluation
 COL_TO_EVAL = args.language_evaluation_column
+NUM_SEED = args.random_seed
 
 # read data
+print('reading data')
 data_path = DATA_FILE.parent
 tweets = CustomDataset(DATA_FILE, data_path)
 print(f"Number of tweets in data: {tweets.__len__()}")
@@ -95,7 +99,7 @@ for split in SPLITS:
                 for config in training_params:
                     config['target_names'] = target_names
                     print(config)
-                    mlm_evaluation(lang_split_idx, tweets, config, split_path, MODEL_PATH, cache_path, save_path, lang, LANG_EVAL, COL_TO_EVAL)
+                    mlm_evaluation(lang_split_idx, tweets, config, split_path, MODEL_PATH, cache_path, save_path, lang, LANG_EVAL, COL_TO_EVAL, NUM_SEED)
             else:
                 # if learning curve required and language to analyse matches
                 if lang==translation_type.split('_')[0]:
@@ -104,8 +108,7 @@ for split in SPLITS:
                         for config in training_params:
                             config['target_names'] = target_names
                             print(config)
-                            mlm_evaluation(each_splitidx, tweets, config, split_path, MODEL_PATH, cache_path, save_path, lang, LANG_EVAL, COL_TO_EVAL, lc=True)
-
+                            mlm_evaluation(each_splitidx, tweets, config, split_path, MODEL_PATH, cache_path, save_path, lang, LANG_EVAL, COL_TO_EVAL, NUM_SEED, lc=True)
 # # using data encoded on tweets for languages used in training
 # target_names = sorted(test_df['final_annotation'].unique().tolist()) # because english lang has only three labels
 # if 'learningcurve' in translation_type:
